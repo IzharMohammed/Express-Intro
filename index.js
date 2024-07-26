@@ -28,12 +28,6 @@ app.get('/', (req, res) => {
     const johnKidneys = user[0].kidneys;
     const noOfKidneys = johnKidneys.length;
 
-    /*   for (let i = 0; i < johnKidneys.length; i++) {
-          if (johnKidneys[i].healthy) {
-              noOfHealthyKidneys++;
-          }
-      } */
-
     noOfHealthyKidneys = johnKidneys.filter(kidneys => kidneys.healthy)
     let healthyKidneys = noOfHealthyKidneys.length;
     const noOfUnhealthyKidneys = noOfKidneys - healthyKidneys;
