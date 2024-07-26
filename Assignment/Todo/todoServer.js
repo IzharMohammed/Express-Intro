@@ -41,69 +41,86 @@
  */
 const express = require('express');
 const bodyParser = require('body-parser');
-
+const fs = require('fs');
 const app = express();
-
 app.use(bodyParser.json());
 
-var todos = [
-    {
-        id: "1",
-        title: "Coding",
-        description: "2 hours"
-    },
-    {
-        id: "12",
-        title: "Entertainment",
-        description: "4 hours"
-    }
-]
+function readTodos() {
+  if (fs.existsSync('./config.json')) {
+    const data = fs.readFileSync('./config.json', 'utf-8');
+    return JSON.parse(data);
+  }
+  return [];
+}
 
+function writeTodos(todo) {
+  let data = JSON.stringify(todo);
+  fs.writeFileSync('./config.json', data, function (err) {
+    if (err) throw err;
+    console.log('Added todo successfully !!!')
+  });
+}
 
-/* app.get('/todos', (req, res) => {
-    res.json({
-        todos
-    })
-}) */
+app.get('/todos', (req, res) => {
+  const todos = readTodos();
+  res.json({
+    todos
+  })
+})
 
 app.get('/todos/:id', (req, res) => {
-    console.log(req.params.id);
-    const id = req.params.id;
-    todos.map(todo => {
-        if (todo.id == id) [
-            res.json({
-                todo
-            })
-        ]
-    })
+  console.log(req.params.id);
+  const id = req.params.id;
+  todos.map(todo => {
+    if (todo.id == id) [
+      res.json({
+        todo
+      })
+    ]
+  })
 })
 
 
-app.post('/todos', (req , res)=>{
-    const markup = 
- ` <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+app.post('/todos', (req, res) => {
+  const todo = req.body;
+  const todosData = readTodos();
+  todosData.push(todo);
+  writeTodos(todosData);
 
-        <form action="/todos" method="post">
-          <input type="text" name="title" placeholder="Add title......">
-          <input type="text" name="description" placeholder="Add description......">
-          <button type="submit">Submit</button>
-      </form>
+  res.json({
+    msg: 'Added todo successfully'
+  })
+})
 
-</body>
-</html>
-    `
-    res.send(markup);
+app.put('/todos/:id', (req , res)=>{
+  let id = req.params.id;
+  const todos = readTodos();
+  const updateddescription = req.body;
+ /*  todos.map(todo =>{
+    if(todo.id == id){
+      {...todo , description : updateddescription}
+    }
+  }) */
+
+    
+})
+
+app.delete('/todos/:id', (req, res) => {
+  let id = req.params.id;
+  const todos = readTodos();
+  let todosData = todos.filter(todo => todo.id != id);
+  writeTodos(todosData);
+
+  res.json({
+    msg: 'Deleted todo successful'
+  })
 })
 
 
+app.use((error, req, res, next) => {
+  res.status(500).send('Something went wrong !!!');
+})
 
-
-
-app.listen(3000);
+app.listen(3000, () => {
+  console.log('server is up');
+});

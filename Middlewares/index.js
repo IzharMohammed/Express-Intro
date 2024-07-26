@@ -72,11 +72,19 @@ function validateInput(obj){
     {
     email : string -> should look like email
     password : string -> should have 4 characters
+    country : "US" , "IN"
     }
     */
     const schema = zod.object({
         email: zod.string().email(), // Email should be a valid email
         password: zod.string().min(4), // Password should have at least 4 characters
+        country :zod.union([
+            zod.literal("IN"),
+            zod.literal("US"),
+            zod.literal("UK"),
+            zod.literal("CA"),
+            zod.literal("AU")
+        ])
     })
 
     const response = schema.safeParse(obj);
@@ -86,7 +94,8 @@ function validateInput(obj){
 // Validate input example
 validateInput({
     email: 'izhar@gmail.com',
-    password: '1234'
+    password: '1234',
+    country : "IN"
 })
 
 // Global error handler middleware
