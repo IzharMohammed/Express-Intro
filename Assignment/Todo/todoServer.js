@@ -45,96 +45,135 @@ const fs = require('fs');
 const app = express();
 app.use(bodyParser.json());
 
+// Function to read todos from the file
 function readTodos() {
+  // Check if the file exists
   if (fs.existsSync('./config.json')) {
+    // Read the file content
     const data = fs.readFileSync('./config.json', 'utf-8');
+    // Parse the JSON data and return
     return JSON.parse(data);
   }
+  // Return an empty array if the file does not exist
   return [];
 }
 
+
+// Function to write todos to the file
 function writeTodos(todo) {
+  // Convert the todos array to a JSON string
   let data = JSON.stringify(todo);
+  // Write the JSON string to the file
   fs.writeFileSync('./config.json', data, function (err) {
+    // Throw an error if writing fails
     if (err) throw err;
-    console.log('Added todo successfully !!!')
+    console.log('Added todo successfully !!!');
   });
 }
 
+
+// Route to get all todos
 app.get('/todos', (req, res) => {
+  // Read todos from the file
   const todos = readTodos();
+  // Respond with the todos in JSON format
   res.json({
     todos
-  })
-})
+  });
+});
 
+
+// Route to get a specific todo by ID
 app.get('/todos/:id', (req, res) => {
+  // Log the ID parameter
   console.log(req.params.id);
+  // Get the ID from the request parameters
   const id = req.params.id;
+  // Iterate over the todos
   todos.map(todo => {
+    // Check if the current todo's ID matches the requested ID
     if (todo.id == id) [
+      // Respond with the matching todo in JSON format
       res.json({
         todo
       })
     ]
-  })
-})
+  });
+});
 
 
+// Route to create a new todo
 app.post('/todos', (req, res) => {
+  // Get the new todo data from the request body
   const todo = req.body;
+  // Read existing todos from the file
   const todosData = readTodos();
+  // Add the new todo to the todos array
   todosData.push(todo);
+  // Write the updated todos array to the file
   writeTodos(todosData);
-
+  // Respond with a success message
   res.json({
     msg: 'Added todo successfully'
-  })
-})
+  });
+});
 
+
+// Route to update an existing todo by ID
 app.put('/todos/:id', (req, res) => {
+  // Get the ID from the request parameters
   let id = req.params.id;
-  /*  todos.map(todo =>{
-    if(todo.id == id){
-      {...todo , description : updateddescription}
-      }
-      }) */
+  // Get the updated title and description from the request body
   let { title, description } = req.body;
+  // Read existing todos from the file
   const todos = readTodos();
+  // Find the index of the todo to be updated
   const todoIndex = todos.find(todo => todo.id === id);
-  console.log('index',todoIndex.id);
- /*  todos[todoIndex.id] = { id, title, description };
-  console.log('before',todos);
-  writeTodos(todos); */
+  // Log the index of the todo to be updated
+  console.log('index', todoIndex.id);
+  // Iterate over the todos
   todos.map(todo => {
-    if(todo.id === id){
+    // Check if the current todo's ID matches the requested ID
+    if (todo.id === id) {
+      // Update the title and description of the todo
       todo.title = title,
       todo.description = description
     }
-  })
+  });
+  // Write the updated todos array to the file
   writeTodos(todos);
+  // Respond with a success message
   res.json({
     msg: "updated todo successfully"
-  })
+  });
+});
 
-})
 
+// Route to delete a todo by ID
 app.delete('/todos/:id', (req, res) => {
+  // Get the ID from the request parameters
   let id = req.params.id;
+  // Read existing todos from the file
   const todos = readTodos();
+  // Filter out the todo with the matching ID
   let todosData = todos.filter(todo => todo.id != id);
+  // Write the updated todos array to the file
   writeTodos(todosData);
-
+  // Respond with a success message
   res.json({
     msg: 'Deleted todo successful'
-  })
-})
+  });
+});
 
 
+// Global error handler middleware
 app.use((error, req, res, next) => {
+  // Respond with a 500 status code and an error message
   res.status(500).send('Something went wrong !!!');
-})
+});
 
+
+// Start the server on port 3000
 app.listen(3000, () => {
   console.log('server is up');
 });
