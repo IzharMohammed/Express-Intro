@@ -92,17 +92,31 @@ app.post('/todos', (req, res) => {
   })
 })
 
-app.put('/todos/:id', (req , res)=>{
+app.put('/todos/:id', (req, res) => {
   let id = req.params.id;
-  const todos = readTodos();
-  const updateddescription = req.body;
- /*  todos.map(todo =>{
+  /*  todos.map(todo =>{
     if(todo.id == id){
       {...todo , description : updateddescription}
+      }
+      }) */
+  let { title, description } = req.body;
+  const todos = readTodos();
+  const todoIndex = todos.find(todo => todo.id === id);
+  console.log('index',todoIndex.id);
+ /*  todos[todoIndex.id] = { id, title, description };
+  console.log('before',todos);
+  writeTodos(todos); */
+  todos.map(todo => {
+    if(todo.id === id){
+      todo.title = title,
+      todo.description = description
     }
-  }) */
+  })
+  writeTodos(todos);
+  res.json({
+    msg: "updated todo successfully"
+  })
 
-    
 })
 
 app.delete('/todos/:id', (req, res) => {
