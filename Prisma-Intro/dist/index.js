@@ -73,6 +73,7 @@ const usersToCreate = [
         lastName: "Knight of the Sea",
     },
 ];
+//CREATE
 function insertUser(username, password, firstName, lastName) {
     return __awaiter(this, void 0, void 0, function* () {
         //Creating single user
@@ -98,6 +99,7 @@ function insertManyUser() {
     });
 }
 // insertManyUser();
+//READ
 function readUsers() {
     return __awaiter(this, void 0, void 0, function* () {
         const allUsers = yield prisma.user.findMany();
@@ -117,4 +119,31 @@ function readUsers1() {
         console.log(result);
     });
 }
-readUsers1();
+function updateUser(username_1, _a) {
+    return __awaiter(this, arguments, void 0, function* (username, { firstName, lastName }) {
+        const result = yield prisma.user.update({
+            where: { username },
+            data: {
+                firstName,
+                lastName
+            }
+        });
+        console.log(result);
+    });
+}
+/* updateUser("jinbeJ" , {
+    firstName : "random",
+    lastName : "user"
+}) */
+function insertTodos() {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield prisma.todos.create({
+            data: {
+                title: "Worlds best swordsman",
+                description: "Loyal",
+                user_id: 5
+            }
+        });
+    });
+}
+insertTodos();

@@ -2,6 +2,28 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+//      All Instructions to run prisma
+/*
+npm init -y
+npm install prisma typescript ts-node @types/node --save-dev
+npx tsc --init
+Change `rootDit` to `src`
+Change `outDir` to `dist`
+npx prisma init
+
+Generate migrations
+npx prisma migrate dev --name Initialize the schema
+
+How to generate the client?
+npx prisma generate
+
+How to run ??
+npx tsc -b 
+node dist/index.js
+*/
+
+
+
 const usersToCreate = [
     {
         username: "luffyM",
@@ -114,4 +136,40 @@ async function readUsers1() {
     console.log(result);
 
 }
-readUsers1();
+//readUsers1();
+
+interface UpdateParams {
+    firstName: string;
+    lastName: string
+}
+
+async function updateUser(username: string, {
+    firstName,
+    lastName
+}: UpdateParams) {
+    const result = await prisma.user.update({
+        where: { username },
+        data: {
+            firstName,
+            lastName
+        }
+    })
+    console.log(result);
+}
+
+/* updateUser("jinbeJ" , {
+    firstName : "random",
+    lastName : "user"
+}) */
+
+    async function insertTodos(){
+        await prisma.todos.create({
+            data : {
+                title : "Worlds best swordsman",
+                description : "Loyal",
+                user_id : 5
+            }
+        })
+    }
+
+    insertTodos();
