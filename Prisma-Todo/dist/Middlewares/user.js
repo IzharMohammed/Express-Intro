@@ -6,8 +6,12 @@ const jwtPassword = "secret";
 // }
 function userMiddleware(req, res, next) {
     try {
-        const token = req.body.token;
+        const token = req.headers.token;
+        console.log('Token',token);
+        
         const response = jwt.verify(token, jwtPassword);
+        console.log('token response', response);
+        
         if (response) {
             next();
         }
@@ -18,3 +22,4 @@ function userMiddleware(req, res, next) {
         });
     }
 }
+module.exports = userMiddleware;
