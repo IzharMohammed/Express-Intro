@@ -6,8 +6,10 @@ const userMiddleware = require('../../dist/Middlewares/user')
 const { PrismaClient } = require("@prisma/client");
 const router = Router();
 const prisma = new PrismaClient();
+import { Request, Response } from 'express';
 
-router.post('/signup', async (req, res) => {
+
+router.post('/signup', async (req : Request, res : Response) => {
     const { username, password, firstName, lastName } = req.body;
 
     const emailSchema = zod.string().email();
@@ -33,7 +35,6 @@ router.post('/signup', async (req, res) => {
             lastName
         }
     })
-    console.log(response);
 
 
 
@@ -43,7 +44,7 @@ router.post('/signup', async (req, res) => {
 
 });
 
-router.post('/signin', (req, res) => {
+router.post('/signin', (req : Request, res : Response) => {
     const username = req.body.username;
     //const response = from prisma
     let token = null;
@@ -58,9 +59,8 @@ router.post('/signin', (req, res) => {
     })
 });
 
-async function getId(token) {
+async function getId(token: string) : Promise<number> {
     const data = jwt.decode(token);
-    console.log(data);
 
     const getUserId = await prisma.user.findFirst({
         where: {
@@ -70,21 +70,25 @@ async function getId(token) {
             id: true
         }
     })
-    return getUserId;
+    return getUserId.id;
 }
 
-router.post('/addTodos', userMiddleware, async (req, res) => {
-    const token = req.headers.token;
+router.post('/addTodos', userMiddleware, async (req : Request, res : Response) => {
+
+    const token = req.headers.token as string | undefined;
+    if(!token){
+        return res.status(401).json({msg : 'No token provided'})
+    }
+
     const getUserId = await getId(token);
     const { title, description, done } = req.body;
-    console.log('title', title);
 
     await prisma.todos.create({
         data: {
             title,
             description,
             done,
-            user_Id: getUserId.id
+            user_Id: getUserId
         }
     })
     res.json({
@@ -92,12 +96,16 @@ router.post('/addTodos', userMiddleware, async (req, res) => {
     })
 });
 
-router.get('/getTodos', userMiddleware, async (req, res) => {
-    const token = req.headers.token;
+router.get('/getTodos', userMiddleware, async (req: Request , res : Response) => {
+    const token = req.headers.token as string | undefined;
+    if (!token) {
+        return res.status(401).json({ msg: 'No token provided' });
+    }
+
     const getUserId = await getId(token);
     const todos = await prisma.todos.findMany({
         where: {
-            user_Id: getUserId.id
+            user_Id: getUserId
         }
     });
     res.json({

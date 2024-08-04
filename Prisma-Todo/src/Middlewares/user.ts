@@ -1,13 +1,18 @@
 const jwt = require("jsonwebtoken");
 const jwtPassword = "secret";
+import { Request, Response, NextFunction } from 'express';
 
-// interface AuthenticatedRequest {
-//         token : string;
-// }
 
-function userMiddleware(req : any, res : any, next : any) {
+function userMiddleware(req : Request, res : Response, next : NextFunction) {
     try {
-        const token = req.body.token ;
+        const token = req.headers.token ;
+        console.log('token',token);
+        
+        if (!token) {
+            return res.status(401).json({
+                msg: 'No token provided'
+            });
+        }
         const response = jwt.verify(token, jwtPassword);
         if(response){
             next();

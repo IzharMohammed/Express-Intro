@@ -1,17 +1,17 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 const jwt = require("jsonwebtoken");
 const jwtPassword = "secret";
-// interface AuthenticatedRequest {
-//         token : string;
-// }
 function userMiddleware(req, res, next) {
     try {
         const token = req.headers.token;
-        console.log('Token',token);
-        
+        console.log('token', token);
+        if (!token) {
+            return res.status(401).json({
+                msg: 'No token provided'
+            });
+        }
         const response = jwt.verify(token, jwtPassword);
-        console.log('token response', response);
-        
         if (response) {
             next();
         }
