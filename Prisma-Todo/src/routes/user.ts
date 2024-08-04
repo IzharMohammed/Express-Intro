@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const jwtPassword = 'secret';
+const jwtPassword = process.env.jwtPassword;
 const zod = require('zod');
 const jwt = require('jsonwebtoken');
 const userMiddleware = require('../../dist/Middlewares/user')

@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const jwtPassword = "secret";
+const jwtPassword = process.env.jwtPassword;
 import { Request, Response, NextFunction } from 'express';
 
 
