@@ -15,22 +15,27 @@ router.post('/signup', async (req, res) => {
 
     const emailResponse = emailSchema.safeParse(username);
     const passwordResponse = passwordSchema.safeParse(password);
-
-    if (emailResponse.success && passwordResponse.success) {
-        const res = await prisma.user.create({
-            data: {
-                username,
-                password,
-                firstName,
-                lastName
-            }
+    if (!emailResponse.success) {
+        return res.json({
+            msg: 'Invalid username'
         })
-        console.log(res);
-
-    } else {
-        console.log('something went wrong');
-
     }
+    if (!passwordResponse.success) {
+        return res.json({
+            msg: 'Minimum 6 letters in password'
+        })
+    }
+    const response = await prisma.user.create({
+        data: {
+            username,
+            password,
+            firstName,
+            lastName
+        }
+    })
+    console.log(response);
+
+
 
     res.json({
         msg: `user successfully created`
@@ -53,9 +58,7 @@ router.post('/signin', (req, res) => {
     })
 });
 
-
-router.post('/addTodos', userMiddleware, async (req, res) => {
-    const token = req.headers.token;
+async function getId(token) {
     const data = jwt.decode(token);
     console.log(data);
 
@@ -67,8 +70,12 @@ router.post('/addTodos', userMiddleware, async (req, res) => {
             id: true
         }
     })
-    console.log('Id', getUserId);
+    return getUserId;
+}
 
+router.post('/addTodos', userMiddleware, async (req, res) => {
+    const token = req.headers.token;
+    const getUserId = await getId(token);
     const { title, description, done } = req.body;
     console.log('title', title);
 
@@ -85,8 +92,17 @@ router.post('/addTodos', userMiddleware, async (req, res) => {
     })
 });
 
-router.get('/getTodos', (req, res) => {
-
+router.get('/getTodos', userMiddleware, async (req, res) => {
+    const token = req.headers.token;
+    const getUserId = await getId(token);
+    const todos = await prisma.todos.findMany({
+        where: {
+            user_Id: getUserId.id
+        }
+    });
+    res.json({
+        Todos: todos
+    })
 });
 
 module.exports = router;
