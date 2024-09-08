@@ -4,7 +4,7 @@ const app = express();
 
 app.use(express.json());
 
-mongoose.connect("mongodb+srv://izharmohammed21:nqyh0LyUHN7GXxKZ@cluster0.jywwa6q.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+mongoose.connect(process.env.DATABASE_URL);
 
 const User = mongoose.model('Users',
     {
