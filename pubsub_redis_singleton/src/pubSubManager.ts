@@ -9,9 +9,9 @@ export class pubSubManager {
 
     private constructor() {
         this.redisClient = createClient();
+        this.redisClient.connect();
         this.publisherClient = createClient();
         this.publisherClient.connect();
-        this.redisClient.connect();
         this.subscriptions = new Map();
     }
 
@@ -56,7 +56,7 @@ export class pubSubManager {
 
     }
 
-    public userUnsubscribe(userId: string, stock: string) {
+    public userUnSubscribe(userId: string, stock: string) {
         this.subscriptions.set(stock, this.subscriptions.get(stock)?.filter(id => id != userId) || []);
 
         if (this.subscriptions.get(stock)?.length === 0) {
